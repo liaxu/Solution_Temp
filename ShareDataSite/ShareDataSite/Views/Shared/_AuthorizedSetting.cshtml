@@ -1,0 +1,15 @@
+﻿<script>
+    var setting = {
+        auth_url: '@ViewData["auth_url"]',
+        token_url: '@ViewData["token_url"]',
+        logout_url: '',         // recommended if available
+        //client_id: 'fbf2a67e-c1f8-4939-9087-f86cca45040e',          // required
+        client_id: '@ViewData["client_id"]',          // required
+        other_params: {
+            scope: '@ViewData["scope"]'
+        },        // optional params object for scope, state, display...
+
+        response_type: 'code',
+        redirect_uri: '@ViewData["redirect_uri"]'
+    }
+</script>
