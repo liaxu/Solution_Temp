@@ -162,8 +162,8 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Scripts\authorize.js" />
-    <Content Include="Scripts\excelTest.js" />
     <Content Include="Scripts\lib\app.js" />
+    <Content Include="Scripts\lib\oauth.js" />
     <Content Include="Scripts\Office\1\access-web-16.00.debug.js" />
     <Content Include="Scripts\Office\1\access-web-16.00.js" />
     <Content Include="Scripts\Office\1\ar-sa\office_strings.debug.js" />
@@ -436,7 +436,6 @@
     <Content Include="Scripts\Office\1\zh-tw\outlook_strings.js" />
     <Content Include="Scripts\Office\metadata\endpoints.xml" />
     <Content Include="Scripts\Office\metadata\features.xml" />
-    <Content Include="Scripts\test.js" />
     <Content Include="Views\Home\filelist.cshtml" />
     <Content Include="Views\Home\rawdata.cshtml" />
     <Content Include="Views\Home\rawlist.cshtml" />
@@ -448,9 +447,7 @@
       <DependentUpon>Web.config</DependentUpon>
     </Content>
     <Content Include="Views\Web.config" />
-    <Content Include="Views\Home\test.cshtml" />
     <Content Include="Views\Shared\_AuthorizedSetting.cshtml" />
-    <Content Include="Views\Home\excelTest.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -485,7 +482,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>33916</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>

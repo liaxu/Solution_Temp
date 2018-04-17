@@ -18,19 +18,18 @@
     <!-- <script src="Scripts/Office/1/office.js" type="text/javascript"></script>  -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.13/vue.js"></script>
     <script src="~/Content/scripts/bluebird.js"></script>
-    @Html.Partial("_AuthorizedSetting")
+    @Html.Partial("_AuthorizedSetting")<!--import app setting-->
+    <script src="~/Scripts/lib/oauth.js"></script>
     <script src="~/Scripts/lib/app.js"></script>
     <script src="~/Content/scripts/index.js"></script>
     @RenderSection("Script", false)
 </head>
 <body>
     @RenderBody()
-
+    <!--dialog-->
     <div id="ShareDatadialog" style="position:absolute;top:0;background:#b7b7b7;width:100%;padding:0 1em;display:none;z-index:9999;">
         <h3 class="ShareDatadialog-title"></h3>
-        <p class="ShareDatadialog-content" style="padding:0 1em;">
-
-        </p>
+        <p class="ShareDatadialog-content" style="padding:0 1em;"></p>
     </div>
 </body>
 </html>

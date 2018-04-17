@@ -2,16 +2,17 @@
 !function () {
     var app = window.app = {};
     var onready = app.onready = [];
-    app.ready = function (func) {//called when login success
+    //register function and called when login success
+    app.ready = function (func) {
         onready.push(func);
     }
 }()
-
+//when Office loaded complete
 Office.initialize = function () {
     var app = window.app;
 
     $(document).ready(function () {
-
+        //call function in app.onready when login success
         $.graph.login(function (res) {
             if (res) {
                 app.onready.map(function (func) {
@@ -27,6 +28,7 @@ Office.initialize = function () {
                 callback && callback(asyncResult);
             });
         };
+
         app.insertText = function (text, callback) {
             Office.context.document.setSelectedDataAsync(text, {
                 coercionType: Office.CoercionType.Text,
@@ -58,13 +60,15 @@ Office.initialize = function () {
         };
 
         if (Office.context.requirements.isSetSupported("ExcelApi")) {
+            //rewrite InsertTable in Excel
             app.insertTable = function (tableBody, tableHeader) {
                 Excel.run(function (context) {
-                    const range = context.workbook.getSelectedRange();
+                    var range = context.workbook.getSelectedRange();
                     range.load("address");
 
                     var tableWidth = tableBody ? tableBody.length ? tableBody[0].length : 0 : 0;
-
+                    var tableLength = tableBody.length;
+                 
                     function convert26BSToDS(code) {
                         var num = -1;
                         var reg = /^[A-Z]+$/g;
@@ -103,7 +107,7 @@ Office.initialize = function () {
                             var tempStart = address.substring(exclamationMark + 1, colon == -1 ? address.length : colon);
                             var firstDigit = tempStart.match(/\d/);
                             var indexed = tempStart.indexOf(firstDigit);
-                            row = parseInt(tempStart.substr(indexed));
+                            row = parseInt(tempStart.substr(indexed)) + tableLength - 1;
                             start = tempStart.substr(0, indexed);
                             end = convert26BSToDS(start) + tableWidth - 1;
                             if (colon == -1) {
@@ -112,15 +116,10 @@ Office.initialize = function () {
                                 return address.substring(0, colon) + ":" + convertDSTo26BS(end) + row;
                             }
                         }()
-                        const currentWorksheet = context.workbook.worksheets.getActiveWorksheet();
-                        //const expensesTable = currentWorksheet.tables.add(range, tableHeader && true /*hasHeaders*/);
-                        const expensesTable = currentWorksheet.tables.add(address, !!tableHeader.length);
-
-                        if (tableHeader.length) {
-                            expensesTable.getHeaderRowRange().values =
-                                [tableHeader];
-                        }
-                        expensesTable.rows.add(null /*add at the end*/, tableBody);
+                        range = context.workbook.worksheets.getActiveWorksheet().getRange(address);
+                        range.load("values");
+                    }).then(function () {
+                        range.values = tableBody;
                     });
                 })
                     .catch(function (error) {
@@ -133,14 +132,7 @@ Office.initialize = function () {
             }
         }
 
-        if (Office.context.requirements.isSetSupported("WordApi")) {
-
-        }
-
-        if (Office.context.requirements.isSetSupported("PowerPointApi")) {
-
-        }
-
+        //show dialog animation
         app.dialog = function (title, content) {
             var dialog = $("#ShareDatadialog");
             dialog.find(".ShareDatadialog-title").text(title);
@@ -148,7 +140,7 @@ Office.initialize = function () {
             dialog.slideDown();
             setTimeout(function () {
                 dialog.slideUp();
-            }, 2000);
+            }, 3000);
         }
     })
 }
@@ -163,56 +155,6 @@ $.hashParam = function (hashstr) {
     }
     return params;
 }
-
-$.graph = function (setting) {
-    this.setting = setting;
-}
-
-$.graph.prototype.login = function (token, authorization, expire_time) {
-    if (token && authorization) {
-        var expire_time = new Date();
-        expire_time.setSeconds(expire_time.getSeconds() + authorization.expires_in);
-        expire_time = expire_time.toUTCString();
-        authorization = JSON.stringify(authorization);
-    } else {
-        if (window.sessionStorage.authorization) {
-            authorization = window.sessionStorage.authorization;
-            token = JSON.parse(window.sessionStorage.authorization).access_token;
-            expire_time = window.sessionStorage.expire_time;
-        } else {
-            console.info("sessionStorage.authorization undefined. login failed.");
-            return false;
-        }
-    }
-    this.token = window.sessionStorage.token = token;
-    this.authorization = authorization;
-    this.expire_time = window.sessionStorage.expire_time = expire_time;
-    setTimeout(this.refreshToken.bind(this), function () {
-        var span = new Date(this.expire_time) - new Date();
-        return ((span - 1000000) < 0 ? 0 : (span - 1000000));
-    }.bind(this)());
-    return true;
-}
-
-$.graph.prototype.refreshToken = function () {
-    var that = this;
-    if (!(this.authorization && this.authorization.refresh_token))
-        throw "no authorization or refresh_token set";
-
-    $.ajax({
-        url: "/Authorization/RefreshToken",
-        data: { refresh_token: this.authorization.refresh_token },
-        type: 'POST',
-        success: function (res) {
-            that.login(res.access_token, res);
-        },
-        error: function (err) {
-            console.error("refreshToken failed");
-            console.error(err);
-        }
-    })
-}
-
 
 var common = function () {
     //get row number and file from stack
@@ -325,49 +267,3 @@ var common = function () {
         Request: request
     };
 }()
-
-$.graph.login = function (setting) {
-    var graph = window.graph = new $.graph(setting);
-    var _dlg;
-
-    return function (callback) {
-        //初始化graph实例
-
-        if (graph.login()) {
-            callback(true);
-        } else {
-            Office.context.ui.displayDialogAsync(
-                location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '') + "/Authorization/Login",
-                { height: 80, width: 50 },
-                function (result) {
-                    _dlg = result.value;
-                    _dlg.addEventHandler(Microsoft.Office.WebExtension.EventType.DialogMessageReceived, function (msg) {
-                        var authorization = $.hashParam(msg.message);
-                        $.ajax({
-                            url: "/Authorization/Code",
-                            data: {
-                                "code": authorization.code,
-                            },
-                            type: 'POST',
-                            success: function (data) {
-                                var access_token;
-                                if ((data instanceof Object)) {
-                                    access_token = data.access_token;
-                                } else {
-                                    access_token = data.getParam("access_token");
-                                }
-                                if (graph.login(access_token, data)) {
-                                    callback(access_token, data);
-                                }
-                            },
-                            error: function (error) {
-                                console.error(error);
-                            }
-                        });
-                        console.log(msg);
-                        _dlg.close();
-                    });
-                });
-        }
-    }
-}(setting)
