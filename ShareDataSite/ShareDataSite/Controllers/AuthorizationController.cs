@@ -1,21 +1,16 @@
-﻿using Newtonsoft.Json;
-using ShareDataSite.Filters;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Collections.Specialized;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
 using System.Web;
 using System.Web.Mvc;
+using ShareDataSite.Filters;
 
 namespace ShareDataSite.Controllers
 {
     [AuthorizedViewData]
     public class AuthorizationController : Controller
     {
-
 
         [Route("Authorization/Login")]
         public ActionResult Login()

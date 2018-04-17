@@ -1,25 +1,35 @@
-﻿using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Presentation;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
+using System.Xml;
 using System.Xml.Linq;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Presentation;
 
 namespace ShareDataService
 {
-    public class PowerPointParse : WriteToFile, IParseFile
+    /// <summary>
+    /// Extract raw data in PowerPoint.
+    /// </summary>
+    public class PowerPointParse : WriteRawDataToFile, IParseFile
     {
+
+        private XNamespace PowerpointmlNamespace = "http://schemas.openxmlformats.org/drawingml/2006/main";
+
         public PowerPointParse(byte[] data, string accessToken, string fileId)
         {
-            base.ParsetempDataArray = this.ReadFileFromDownloadUriToStream(data);
+            base.ParseTempDataArray = this.ReadFileRawDataFromByteArray(data);
             base.AccessToken = accessToken;
             base.FileId = fileId;
         }
-
-        public TempData[] ReadFileFromDownloadUriToStream(byte[] data)
+        /// <summary>
+        /// Reading file raw data from file byte data.
+        /// </summary>
+        /// <param name="data">File resources as byte arrays.</param>
+        /// <returns>An array of objects containing raw data.</returns>
+        public TempData[] ReadFileRawDataFromByteArray(byte[] data)
         {
             try
             {
@@ -28,29 +38,30 @@ namespace ShareDataService
                 {
                     List<TempData> result = new List<TempData>();
 
-                    PresentationPart part = presentationDocument.PresentationPart;
-                    OpenXmlElementList childElements = part.Presentation.SlideIdList.ChildElements;
+                    PresentationPart presentationPart = presentationDocument.PresentationPart;
 
-                    var slideParts = from item in childElements
-                                     select (SlidePart)part.GetPartById((item as SlideId).RelationshipId);
-
+                    OpenXmlElementList openXmlElementList = presentationPart.Presentation.SlideIdList.ChildElements;
+                    // Get all SlideParts.
+                    var slideParts = from item in openXmlElementList
+                                     select (SlidePart)presentationPart.GetPartById((item as SlideId).RelationshipId);
+                    // Retrieve the text of each slidePart.  
                     var slideText = from item in slideParts
-                                    select (WriteToFile.GetSlideText(item));
-                    result.AddRange(TempData.GetTempDataIEnumerable(StorageType.TextType, slideText));
+                                    select (GetSlideText(item));
 
+                    result.AddRange(TempData.GetTempDataIEnumerable(StorageType.TextType, slideText));
                     Stream stream = null;
-                    byte[] streamByteArr = null;
+                    byte[] streamByteArray = null;
+                    // Find image and add to the result.
                     foreach (var slide in slideParts)
                     {
                         result.AddRange(slide.ImageParts.Select(m =>
                         {
                             stream = m.GetStream();
-                            streamByteArr = new byte[stream.Length];
-                            stream.Read(streamByteArr, 0, (int)stream.Length);
-                            return new TempData { StorageType = StorageType.ImageType, Data = Convert.ToBase64String(streamByteArr) };
+                            streamByteArray = new byte[stream.Length];
+                            stream.Read(streamByteArray, 0, (int)stream.Length);
+                            return new TempData { StorageType = StorageType.ImageType, Data = Convert.ToBase64String(streamByteArray) };
                         }).ToArray());
                     }
-
                     return result.ToArray();
                 }
             }
@@ -59,5 +70,21 @@ namespace ShareDataService
                 throw ex;
             }
         }
+
+        /// <summary>
+        /// Get text in SlidePart.
+        /// </summary>
+        /// <param name="slidePart">SlidePart Object.</param>
+        /// <returns>Text string.</returns>
+        private string GetSlideText(SlidePart slidePart)
+        {
+            XDocument xDoc = XDocument.Load(XmlReader.Create(slidePart.GetStream()));
+            if (xDoc == null)
+            {
+                return "";
+            }
+            return string.Join("", xDoc.Root.Descendants(PowerpointmlNamespace + "t").Select(m => (string)m));
+        }
+
     }
 }
