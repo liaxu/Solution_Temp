@@ -121,8 +121,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StorageType.cs" />
     <Compile Include="TempData.cs" />
+    <Compile Include="UploadFileToOneDrive.cs" />
     <Compile Include="WordParse.cs" />
-    <Compile Include="WriteToFile.cs" />
+    <Compile Include="WriteRawDataToFile.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

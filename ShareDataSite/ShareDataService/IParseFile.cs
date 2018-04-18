@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ShareDataService
+﻿namespace ShareDataService
 {
+    /// <summary>
+    /// Extract file content interface.
+    /// </summary>
     public interface IParseFile
     {
-        TempData[] ReadFileFromDownloadUriToStream(byte[] data);
+        /// <summary>
+        /// Reading file raw data from file byte data.
+        /// </summary>
+        /// <param name="data">File resources as byte arrays.</param>
+        /// <returns>An array of objects containing raw data.</returns>
+        TempData[] ReadFileRawDataFromByteArray(byte[] data);
     }
 }

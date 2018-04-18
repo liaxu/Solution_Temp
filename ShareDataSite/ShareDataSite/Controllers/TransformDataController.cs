@@ -1,31 +1,33 @@
-﻿using Newtonsoft.Json;
-using ShareDataService;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web.Mvc;
+using Newtonsoft.Json;
+using ShareDataService;
+using ShareDataSite.Models;
 
 namespace ShareDataSite.Controllers
 {
+    /// <summary>
+    /// Convert files to RawData controller.
+    /// </summary>
     public class TransformDataController : Controller
     {
-        public class InputObject
-        {
-            public string AccessToken { get; set; }
-            public string FileId { get; set; }
-        }
+        /// <summary>
+        /// Get the converted raw data of the file and return it as html.
+        /// </summary>
+        /// <returns>Html with raw data.</returns>
         [Route("api/getrawdata")]
         [HttpPost]
         public string GetHtmlAfterTransformData()
         {
+            // Get Onedrive file download address.
             string downloadUri = this.Request.QueryString["downloaduri"];
 
             Stream req = Request.InputStream;
-            req.Seek(0, System.IO.SeekOrigin.Begin);
+            req.Seek(0, SeekOrigin.Begin);
             string json = new StreamReader(req).ReadToEnd();
-
             InputObject inputOjbect = null;
             try
             {
@@ -33,17 +35,20 @@ namespace ShareDataSite.Controllers
             }
             catch (Exception)
             {
-                return String.Empty;
+                return string.Empty;
             }
 
             string accessToken = inputOjbect.AccessToken;
             string fileId = inputOjbect.FileId;
 
+            // Download the file in Onedrive.
             var webclient = new WebClient();
             byte[] data = webclient.DownloadData(downloadUri);
+
+            // Get the file name.
             var fileName = webclient.ResponseHeaders.GetValues("Content-Disposition").FirstOrDefault();
 
-            var parse = new WriteToFile();
+            var parse = new WriteRawDataToFile();
             if (fileName.ToLower().Contains(".doc") || fileName.ToLower().Contains(".docx"))
             {
                 parse = new WordParse(data, accessToken, fileId);
@@ -58,10 +63,10 @@ namespace ShareDataSite.Controllers
             }
             else
             {
-                return String.Empty;
+                return string.Empty;
             }
 
-            return parse.TempDataToHtml();
+            return parse.TempDataToHtmlAndUploadToOneDrive();
         }
     }
 }

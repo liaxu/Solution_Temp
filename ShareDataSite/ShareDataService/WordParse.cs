@@ -10,18 +10,35 @@ using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace ShareDataService
 {
-    public class WordParse : WriteToFile, IParseFile
+    /// <summary>
+    /// Extract raw data in word.
+    /// </summary>
+    public class WordParse : WriteRawDataToFile, IParseFile
     {
-        private XNamespace w = wordmlNamespace;
+        /// <summary>
+        /// WordNamespace.
+        /// </summary>
+        private XNamespace wordNamespace = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
 
+        /// <summary>
+        /// WordParse constructor.
+        /// </summary>
+        /// <param name="data">File resources as byte arrays.</param>
+        /// <param name="accessToken">OneDrive access token.</param>
+        /// <param name="fileId">File id in OneDrive.</param>
         public WordParse(byte[] data, string accessToken, string fileId)
         {
-            base.ParsetempDataArray = this.ReadFileFromDownloadUriToStream(data);
+            base.ParseTempDataArray = this.ReadFileRawDataFromByteArray(data);
             base.AccessToken = accessToken;
             base.FileId = fileId;
         }
 
-        public TempData[] ReadFileFromDownloadUriToStream(byte[] data)
+        /// <summary>
+        /// Reading file raw data from file byte data.
+        /// </summary>
+        /// <param name="data">File resources as byte arrays.</param>
+        /// <returns>An array of objects containing raw data.</returns>
+        public TempData[] ReadFileRawDataFromByteArray(byte[] data)
         {
             try
             {
@@ -29,12 +46,11 @@ namespace ShareDataService
                  WordprocessingDocument.Open(new MemoryStream(data), false))
                 {
                     List<TempData> result = new List<TempData>();
-
                     XDocument xDoc = null;
-                    var wdPackage = wordprocessingDocument.Package;
+                    var wordPackage = wordprocessingDocument.Package;
                     PackageRelationship docPackageRelationship =
-                            wdPackage
-                            .GetRelationshipsByType(documentRelationshipType)
+                            wordPackage
+                            .GetRelationshipsByType(DocumentRelationshipType)
                             .FirstOrDefault();
                     if (docPackageRelationship != null)
                     {
@@ -43,7 +59,9 @@ namespace ShareDataService
                             .ResolvePartUri(
                                 new Uri("/", UriKind.Relative),
                                         docPackageRelationship.TargetUri);
-                        PackagePart documentPart = wdPackage.GetPart(documentUri);
+                        PackagePart documentPart = wordPackage.GetPart(documentUri);
+
+                        //  Load the document XML in the part into an XDocument instance.  
                         xDoc = XDocument.Load(XmlReader.Create(documentPart.GetStream()));
                     }
 
@@ -51,9 +69,9 @@ namespace ShareDataService
                     var paragraphs =
                         from para in xDoc
                                      .Root
-                                     .Element(w + "body")
-                                     .Descendants(w + "p")
-                                     where !para.Parent.Name.LocalName.Equals("tc")
+                                     .Element(wordNamespace + "body")
+                                     .Descendants(wordNamespace + "p")
+                        where !para.Parent.Name.LocalName.Equals("tc")
                         select new
                         {
                             ParagraphNode = para
@@ -66,54 +84,58 @@ namespace ShareDataService
 
                     result.AddRange(TempData.GetTempDataIEnumerable(StorageType.TextType, paraWithText));
 
-
                     // Find all tables in the document.
                     var tables =
                         wordprocessingDocument.MainDocumentPart.Document.Body.Elements<Table>();
 
                     // Retrieve the text of each table.  
+                    var tablesText = tables.Select(table =>
+                     {
+                         var rows = table.Elements<TableRow>();
+                         var rowsText = rows.Select(row =>
+                          {
+                              var cells = row.Elements<TableCell>();
+                              var cellsText = cells.Select(cell =>
+                              {
+                                  // Find the first paragraph in the table cell.
+                                  Paragraph p = cell.Elements<Paragraph>().FirstOrDefault();
+                                  // Find the first run in the paragraph.
+                                  Run r = p.Elements<Run>().FirstOrDefault();
+                                  if (r == null)
+                                  {
+                                      return "<td></td>";
+                                  }
 
-                    var tablesText =tables.Select(table =>
-                    {
-                        var rows=table.Elements<TableRow>();
-                        var rowsText=rows.Select(row =>
-                        {
-                            var cells=row.Elements<TableCell>();
-                            var cellsText = cells.Select(cell =>
-                            {
-                                // Find the first paragraph in the table cell.
-                                Paragraph p = cell.Elements<Paragraph>().FirstOrDefault();
-                                // Find the first run in the paragraph.
-                                Run r = p.Elements<Run>().FirstOrDefault();
-                                if (r == null)
-                                {
-                                    return "<td></td>";
-                                }
-                                // Set the text for the run.
-                                Text t = r.Elements<Text>().FirstOrDefault();
-                                var text = (t == null ? "" : t.Text);
-                                return "<td>" + text + "</td>";
-                            });
-                            return "<tr>" + string.Join("",cellsText) + "</tr>";
-                        });
-                        if (rowsText!=null && rowsText.Count()>0)
-                        {
-                            return string.Join("",rowsText);
-                        }
-                        return "";
-                    });
-                    
+                                  // Set the text for the run.
+                                  Text t = r.Elements<Text>().FirstOrDefault();
+                                  var text = t == null ? string.Empty : t.Text;
+
+                                  // For the brower can display xml snippet normally.
+                                  text = text.Replace("<", @"&lt;");
+                                  return "<td>" + text + "</td>";
+                              });
+                              return "<tr>" + string.Join(string.Empty, cellsText) + "</tr>";
+                          });
+                         if (rowsText != null && rowsText.Count() > 0)
+                         {
+                             return string.Join(string.Empty, rowsText);
+                         }
+
+                         return string.Empty;
+                     });
+
                     result.AddRange(TempData.GetTempDataIEnumerable(StorageType.TableType, tablesText));
 
-                    // Find image and add to the result
+                    // Find image and add to the result.
                     var imageParts = wordprocessingDocument.MainDocumentPart.ImageParts;
-                    byte[] arr = null;
+                    byte[] streamByteArray = null;
+                    Stream stream = null;
                     foreach (ImagePart item in imageParts)
                     {
-                        var stream = item.GetStream();
-                        arr = new byte[stream.Length];
-                        stream.Read(arr, 0, (int)stream.Length);
-                        result.Add(new TempData { StorageType = StorageType.ImageType, Data = Convert.ToBase64String(arr) });
+                        stream = item.GetStream();
+                        streamByteArray = new byte[stream.Length];
+                        stream.Read(streamByteArray, 0, (int)stream.Length);
+                        result.Add(new TempData { StorageType = StorageType.ImageType, Data = Convert.ToBase64String(streamByteArray) });
                     }
 
                     return result.ToArray();
@@ -123,6 +145,19 @@ namespace ShareDataService
             {
                 throw ex;
             }
+        }
+
+        /// <summary>
+        /// Get paragraph text.
+        /// </summary>
+        /// <param name="e">Paragraph node objects.</param>
+        /// <returns>Paragraph text string.</returns>
+        private string ParagraphText(XElement e)
+        {
+            XNamespace w = e.Name.Namespace;
+            return e
+                   .Descendants(w + "t")
+                   .StringConcatenate(element => (string)element);
         }
     }
 }
