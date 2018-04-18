@@ -89,7 +89,7 @@ namespace ShareDataSite.Controllers
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(new Uri(AuthorizedViewDataAttribute.TokenUrl));
             request.Method = "POST";
             request.ContentType = "application/x-www-form-urlencoded";
-            NameValueCollection outgoingQueryString = HttpUtility.ParseQueryString(string.Empty);
+            NameValueCollection outgoingQueryString = HttpUtility.ParseQueryString(String.Empty);
             outgoingQueryString.Add("client_id", AuthorizedViewDataAttribute.ClientId);
             outgoingQueryString.Add("refresh_token", refresh_token);
             outgoingQueryString.Add("scope", AuthorizedViewDataAttribute.Scope);
