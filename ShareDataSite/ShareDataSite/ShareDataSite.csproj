@@ -146,7 +146,9 @@
     <Compile Include="Controllers\AuthorizationController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\TransformDataController.cs" />
-    <Compile Include="Filters\AuthorizedViewDataAttribute.cs" />
+    <Compile Include="Filters\AuthorizedViewDataAttribute.cs">
+      <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
+    </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

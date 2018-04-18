@@ -43,16 +43,16 @@ namespace ShareDataSite.Controllers
         [Route("Authorization/Code")]
         public ActionResult Code(string code)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(new Uri(AuthorizedViewDataAttribute.token_url));
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(new Uri(AuthorizedViewDataAttribute.TokenUrl));
             request.Method = "POST";
             request.ContentType = "application/x-www-form-urlencoded";
             NameValueCollection outgoingQueryString = HttpUtility.ParseQueryString(string.Empty);
             outgoingQueryString.Add("code", code);
-            outgoingQueryString.Add("client_id", AuthorizedViewDataAttribute.client_id);
-            outgoingQueryString.Add("client_secret", AuthorizedViewDataAttribute.client_secret);
-            outgoingQueryString.Add("redirect_uri", AuthorizedViewDataAttribute.redirect_uri);
+            outgoingQueryString.Add("client_id", AuthorizedViewDataAttribute.ClientId);
+            outgoingQueryString.Add("client_secret", AuthorizedViewDataAttribute.ClientSecret);
+            outgoingQueryString.Add("redirect_uri", AuthorizedViewDataAttribute.RedirectUri);
             outgoingQueryString.Add("grant_type", "authorization_code");
-            outgoingQueryString.Add("scope", AuthorizedViewDataAttribute.scope);
+            outgoingQueryString.Add("scope", AuthorizedViewDataAttribute.Scope);
             string postdata = outgoingQueryString.ToString();
             byte[] buffer = System.Text.Encoding.UTF8.GetBytes(postdata);
             request.ContentLength = buffer.Length;
@@ -86,16 +86,16 @@ namespace ShareDataSite.Controllers
         [Route("Authorization/RefreshToken")]
         public ActionResult RefreshToken(string refresh_token)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(new Uri(AuthorizedViewDataAttribute.token_url));
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(new Uri(AuthorizedViewDataAttribute.TokenUrl));
             request.Method = "POST";
             request.ContentType = "application/x-www-form-urlencoded";
             NameValueCollection outgoingQueryString = HttpUtility.ParseQueryString(String.Empty);
-            outgoingQueryString.Add("client_id", AuthorizedViewDataAttribute.client_id);
+            outgoingQueryString.Add("client_id", AuthorizedViewDataAttribute.ClientId);
             outgoingQueryString.Add("refresh_token", refresh_token);
-            outgoingQueryString.Add("scope", AuthorizedViewDataAttribute.scope);
-            outgoingQueryString.Add("redirect_uri", AuthorizedViewDataAttribute.redirect_uri);
+            outgoingQueryString.Add("scope", AuthorizedViewDataAttribute.Scope);
+            outgoingQueryString.Add("redirect_uri", AuthorizedViewDataAttribute.RedirectUri);
             outgoingQueryString.Add("grant_type", "refresh_token");
-            outgoingQueryString.Add("client_secret", AuthorizedViewDataAttribute.client_secret);
+            outgoingQueryString.Add("client_secret", AuthorizedViewDataAttribute.ClientSecret);
             string postdata = outgoingQueryString.ToString();
             byte[] buffer = System.Text.Encoding.UTF8.GetBytes(postdata);
             request.ContentLength = buffer.Length;
