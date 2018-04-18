@@ -8,33 +8,45 @@ using ShareDataSite.Filters;
 
 namespace ShareDataSite.Controllers
 {
+
+    /// <summary>
+    /// Authorization Controller.
+    /// </summary>
     [AuthorizedViewData]
     public class AuthorizationController : Controller
     {
-
+        /// <summary>
+        /// Login page.
+        /// </summary>
+        /// <returns>ViewResult object.</returns>
         [Route("Authorization/Login")]
         public ActionResult Login()
         {
             return View();
         }
-        [Route("Authorization/Logout")]
-        public ActionResult Logout()
-        {
-            return View();
-        }
+
+        /// <summary>
+        /// Authorize page.
+        /// </summary>
+        /// <returns>ViewResult object.</returns>
         [Route("Authorization/Authorize")]
         public ActionResult Authorize()
         {
             return View();
         }
 
+        /// <summary>
+        /// Request token.
+        /// </summary>
+        /// <param name="code">Authorize code.</param>
+        /// <returns>Results with Token.</returns>
         [Route("Authorization/Code")]
         public ActionResult Code(string code)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(new Uri(AuthorizedViewDataAttribute.token_url));
             request.Method = "POST";
             request.ContentType = "application/x-www-form-urlencoded";
-            NameValueCollection outgoingQueryString = HttpUtility.ParseQueryString(String.Empty);
+            NameValueCollection outgoingQueryString = HttpUtility.ParseQueryString(string.Empty);
             outgoingQueryString.Add("code", code);
             outgoingQueryString.Add("client_id", AuthorizedViewDataAttribute.client_id);
             outgoingQueryString.Add("client_secret", AuthorizedViewDataAttribute.client_secret);
@@ -61,10 +73,16 @@ namespace ShareDataSite.Controllers
                     StreamReader sr = new StreamReader(webex.Response.GetResponseStream());
                     var a = sr.ReadToEnd();
                 }
+
                 throw;
             }
         }
 
+        /// <summary>
+        /// Refresh Token.
+        /// </summary>
+        /// <param name="refresh_token">The refresh_token that you acquired during the token request.</param>
+        /// <returns>Results with Token.</returns>
         [Route("Authorization/RefreshToken")]
         public ActionResult RefreshToken(string refresh_token)
         {
@@ -98,6 +116,7 @@ namespace ShareDataSite.Controllers
                     StreamReader sr = new StreamReader(webex.Response.GetResponseStream());
                     var a = sr.ReadToEnd();
                 }
+
                 throw;
             }
         }

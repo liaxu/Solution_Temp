@@ -16,12 +16,14 @@ namespace ShareDataService
         /// <param name="source">source.</param>
         /// <param name="func">Lambda expression.</param>
         /// <returns>String.</returns>
-        public static string StringConcatenate<T>(this IEnumerable<T> source,
-            Func<T, string> func)
+        public static string StringConcatenate<T>(this IEnumerable<T> source, Func<T, string> func)
         {
             StringBuilder sb = new StringBuilder();
             foreach (T item in source)
+            {
                 sb.Append(func(item));
+            }
+
             return sb.ToString();
         }
     }

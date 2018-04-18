@@ -8,13 +8,11 @@ using Microsoft.Graph;
 
 namespace ShareDataService
 {
-
     /// <summary>
     /// Upload files to OneDrive.
     /// </summary>
     public class UploadFileToOneDrive
     {
-
         /// <summary>
         /// Upload up to 4MB size files to Onedrive.
         /// </summary>

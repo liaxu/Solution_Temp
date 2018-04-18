@@ -15,14 +15,24 @@ namespace ShareDataService
     /// </summary>
     public class WordParse : WriteRawDataToFile, IParseFile
     {
-        private XNamespace w = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+        /// <summary>
+        /// WordNamespace.
+        /// </summary>
+        private XNamespace wordNamespace = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
 
+        /// <summary>
+        /// WordParse constructor.
+        /// </summary>
+        /// <param name="data">File resources as byte arrays.</param>
+        /// <param name="accessToken">OneDrive access token.</param>
+        /// <param name="fileId">File id in OneDrive.</param>
         public WordParse(byte[] data, string accessToken, string fileId)
         {
             base.ParseTempDataArray = this.ReadFileRawDataFromByteArray(data);
             base.AccessToken = accessToken;
             base.FileId = fileId;
         }
+
         /// <summary>
         /// Reading file raw data from file byte data.
         /// </summary>
@@ -37,9 +47,9 @@ namespace ShareDataService
                 {
                     List<TempData> result = new List<TempData>();
                     XDocument xDoc = null;
-                    var wdPackage = wordprocessingDocument.Package;
+                    var wordPackage = wordprocessingDocument.Package;
                     PackageRelationship docPackageRelationship =
-                            wdPackage
+                            wordPackage
                             .GetRelationshipsByType(DocumentRelationshipType)
                             .FirstOrDefault();
                     if (docPackageRelationship != null)
@@ -49,7 +59,7 @@ namespace ShareDataService
                             .ResolvePartUri(
                                 new Uri("/", UriKind.Relative),
                                         docPackageRelationship.TargetUri);
-                        PackagePart documentPart = wdPackage.GetPart(documentUri);
+                        PackagePart documentPart = wordPackage.GetPart(documentUri);
 
                         //  Load the document XML in the part into an XDocument instance.  
                         xDoc = XDocument.Load(XmlReader.Create(documentPart.GetStream()));
@@ -59,8 +69,8 @@ namespace ShareDataService
                     var paragraphs =
                         from para in xDoc
                                      .Root
-                                     .Element(w + "body")
-                                     .Descendants(w + "p")
+                                     .Element(wordNamespace + "body")
+                                     .Descendants(wordNamespace + "p")
                         where !para.Parent.Name.LocalName.Equals("tc")
                         select new
                         {
@@ -95,20 +105,23 @@ namespace ShareDataService
                                   {
                                       return "<td></td>";
                                   }
+
                                   // Set the text for the run.
                                   Text t = r.Elements<Text>().FirstOrDefault();
-                                  var text = (t == null ? "" : t.Text);
+                                  var text = t == null ? string.Empty : t.Text;
+
                                   // For the brower can display xml snippet normally.
                                   text = text.Replace("<", @"&lt;");
                                   return "<td>" + text + "</td>";
                               });
-                              return "<tr>" + string.Join("", cellsText) + "</tr>";
+                              return "<tr>" + string.Join(string.Empty, cellsText) + "</tr>";
                           });
                          if (rowsText != null && rowsText.Count() > 0)
                          {
-                             return string.Join("", rowsText);
+                             return string.Join(string.Empty, rowsText);
                          }
-                         return "";
+
+                         return string.Empty;
                      });
 
                     result.AddRange(TempData.GetTempDataIEnumerable(StorageType.TableType, tablesText));
@@ -124,6 +137,7 @@ namespace ShareDataService
                         stream.Read(streamByteArray, 0, (int)stream.Length);
                         result.Add(new TempData { StorageType = StorageType.ImageType, Data = Convert.ToBase64String(streamByteArray) });
                     }
+
                     return result.ToArray();
                 }
             }
@@ -145,6 +159,5 @@ namespace ShareDataService
                    .Descendants(w + "t")
                    .StringConcatenate(element => (string)element);
         }
-
     }
 }

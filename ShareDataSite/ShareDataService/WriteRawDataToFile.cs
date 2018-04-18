@@ -12,6 +12,28 @@ namespace ShareDataService
     public class WriteRawDataToFile
     {
         /// <summary>
+        /// DocumentRelationshipType.
+        /// </summary>
+        public const string DocumentRelationshipType =
+          "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument";
+
+        /// <summary>
+        /// Base address.
+        /// </summary>
+        public const string EndpointBase = @"https://graph.microsoft.com/v1.0";
+
+        /// <summary>
+        /// RawData upload address.
+        /// </summary>
+        public const string RawDataPath = @"/SharedDataApp/RawData/";
+
+        /// <summary>
+        /// StylesRelationshipType.
+        /// </summary>
+        public const string StylesRelationshipType =
+          "http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles";
+
+        /// <summary>
         /// Delegate to upload instance object.
         /// </summary>
         public UploadFile UploadFileMethod { get; set; }
@@ -31,23 +53,6 @@ namespace ShareDataService
         /// </summary>
         public TempData[] ParseTempDataArray { get; set; }
 
-
-        public const string DocumentRelationshipType =
-          "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument";
-
-        /// <summary>
-        /// Base address.
-        /// </summary>
-        public const string EndpointBase = @"https://graph.microsoft.com/v1.0";
-
-        /// <summary>
-        /// RawData upload address.
-        /// </summary>
-        public const string RawDataPath = @"/SharedDataApp/RawData/";
-
-        public const string StylesRelationshipType =
-          "http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles";
-
         /// <summary>
         /// Delegation definition of upload file.
         /// </summary>
@@ -57,21 +62,6 @@ namespace ShareDataService
         /// <param name="endpointBase">Base address.</param>
         /// <returns></returns>
         public delegate Task UploadFile(string accessToken, Stream file, string fileName, string endpointBase);
-
-        /// <summary>
-        /// Convert string to stream object.
-        /// </summary>
-        /// <param name="s">String Object.</param>
-        /// <returns>Stream Object.</returns>
-        private Stream GenerateStreamFromString(string s)
-        {
-            MemoryStream stream = new MemoryStream();
-            StreamWriter writer = new StreamWriter(stream);
-            writer.Write(s);
-            writer.Flush();
-            stream.Position = 0;
-            return stream;
-        }
 
         /// <summary>
         /// Wrap Raw data in html and upload it to OneDrive.
@@ -85,6 +75,7 @@ namespace ShareDataService
                 switch (tempData.StorageType)
                 {
                     case StorageType.TextType:
+
                         // For the brower can display xml snippet normally.
                         tempData.Data = tempData.Data.Replace("<", @"&lt;");
                         result += "<div class=\"base text\">" + tempData.Data + @"</div>";
@@ -99,8 +90,10 @@ namespace ShareDataService
                         break;
                 }
             }
+
             // Convert raw data to stream objects.
             var fileStream = GenerateStreamFromString(result);
+
             // Judgment file stream content length greater than 4MB use UploadBigFileToOneDrive method, otherwise use UploadSmallFileToOneDrive method.
             if (new byte[fileStream.Length].Length < (4 * 1024 * 1024))
             {
@@ -130,10 +123,25 @@ namespace ShareDataService
                 fileName += "noname.rawdata";
                 throw ex;
             }
+
             // Call upload method.
             UploadFileMethod(AccessToken, fileStream, fileName, EndpointBase);
             return result;
         }
 
+        /// <summary>
+        /// Convert string to stream object.
+        /// </summary>
+        /// <param name="s">String Object.</param>
+        /// <returns>Stream Object.</returns>
+        private Stream GenerateStreamFromString(string s)
+        {
+            MemoryStream stream = new MemoryStream();
+            StreamWriter writer = new StreamWriter(stream);
+            writer.Write(s);
+            writer.Flush();
+            stream.Position = 0;
+            return stream;
+        }
     }
 }

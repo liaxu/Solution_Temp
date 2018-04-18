@@ -1,12 +1,10 @@
 ﻿namespace ShareDataService
 {
-
     /// <summary>
     /// Raw data type.
     /// </summary>
     public enum StorageType
     {
-
         /// <summary>
         /// Text type.
         /// </summary>

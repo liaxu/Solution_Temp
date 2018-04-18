@@ -12,6 +12,12 @@ namespace ShareDataService
     /// </summary>
     public class ExcelParse : WriteRawDataToFile, IParseFile
     {
+        /// <summary>
+        /// ExcelParse constructor.
+        /// </summary>
+        /// <param name="data">File resources as byte arrays.</param>
+        /// <param name="accessToken">OneDrive access token.</param>
+        /// <param name="fileId">File id in OneDrive.</param>
         public ExcelParse(byte[] data, string accessToken, string fileId)
         {
             base.ParseTempDataArray = this.ReadFileRawDataFromByteArray(data);
@@ -39,15 +45,18 @@ namespace ShareDataService
                     List<TempData> result = new List<TempData>();
 
                     WorkbookPart workbookPart = spreadsheetDocument.WorkbookPart;
+
                     // Get all Sheets in the document.
                     var sheets = workbookPart.Workbook.Descendants<Sheet>();
 
                     foreach (var sheet in sheets)
                     {
                         WorksheetPart worksheetPart =
-                       (WorksheetPart)(workbookPart.GetPartById(sheet.Id));
+                       (WorksheetPart)workbookPart.GetPartById(sheet.Id);
+
                         // Get all the rows in the sheet.
                         rows = worksheetPart.Worksheet.Descendants<Row>();
+
                         // Get the text in each row.
                         rowTexts = rows.Select(m =>
                         {
@@ -55,14 +64,15 @@ namespace ShareDataService
                             cellTexts = m.Descendants<Cell>().Select(cell =>
                             {
                                 var cellText = GetCellText(cell, workbookPart);
+
                                 // For the brower can display xml snippet normally.
                                 cellText = cellText.Replace("<", @"&lt;");
                                 return "<td>" + cellText + "</td>";
                             }).ToArray();
-                            return "<tr>" + string.Join("", cellTexts) + "</tr>";
+                            return "<tr>" + string.Join(string.Empty, cellTexts) + "</tr>";
                         });
 
-                        result.Add(new TempData { StorageType = StorageType.TableType, Data = string.Join("", rowTexts) });
+                        result.Add(new TempData { StorageType = StorageType.TableType, Data = string.Join(string.Empty, rowTexts) });
 
                         // Get all the images in the document.
                         if (worksheetPart.DrawingsPart != null && worksheetPart.DrawingsPart.ImageParts != null)
@@ -77,6 +87,7 @@ namespace ShareDataService
                             result.AddRange(imgs);
                         }
                     }
+
                     return result.ToArray();
                 }
             }
@@ -90,12 +101,13 @@ namespace ShareDataService
         /// Get text in a cell.
         /// </summary>
         /// <param name="cell">Cell object.</param>
-        /// <param name="wbPart">WorkbookPart object.</param>
+        /// <param name="workbookPart">WorkbookPart object.</param>
         /// <returns>Cell text.</returns>
         private string GetCellText(Cell cell, WorkbookPart workbookPart)
         {
             var value = cell.InnerText;
             if (cell.DataType != null)
+            {
                 switch (cell.DataType.Value)
                 {
                     case CellValues.SharedString:
@@ -110,6 +122,7 @@ namespace ShareDataService
                                sharedStringTablePart.SharedStringTable
                                .ElementAt(int.Parse(value)).InnerText;
                         }
+
                         break;
 
                     case CellValues.Boolean:
@@ -122,10 +135,12 @@ namespace ShareDataService
                                 value = "TRUE";
                                 break;
                         }
+
                         break;
-                };
+                }
+            }
+
             return value;
         }
-
     }
 }

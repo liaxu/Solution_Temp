@@ -15,20 +15,30 @@ namespace ShareDataService
     /// </summary>
     public class PowerPointParse : WriteRawDataToFile, IParseFile
     {
+        /// <summary>
+        /// PowerpointmlNamespace.
+        /// </summary>
+        private XNamespace powerpointmlNamespace = "http://schemas.openxmlformats.org/drawingml/2006/main";
 
-        private XNamespace PowerpointmlNamespace = "http://schemas.openxmlformats.org/drawingml/2006/main";
-
+        /// <summary>
+        /// PowerPointParse constructor.
+        /// </summary>
+        /// <param name="data">File resources as byte arrays.</param>
+        /// <param name="accessToken">OneDrive access token.</param>
+        /// <param name="fileId">File id in OneDrive.</param>
         public PowerPointParse(byte[] data, string accessToken, string fileId)
         {
             base.ParseTempDataArray = this.ReadFileRawDataFromByteArray(data);
             base.AccessToken = accessToken;
             base.FileId = fileId;
         }
+
         /// <summary>
         /// Reading file raw data from file byte data.
         /// </summary>
         /// <param name="data">File resources as byte arrays.</param>
         /// <returns>An array of objects containing raw data.</returns>
+
         public TempData[] ReadFileRawDataFromByteArray(byte[] data)
         {
             try
@@ -41,16 +51,19 @@ namespace ShareDataService
                     PresentationPart presentationPart = presentationDocument.PresentationPart;
 
                     OpenXmlElementList openXmlElementList = presentationPart.Presentation.SlideIdList.ChildElements;
+
                     // Get all SlideParts.
                     var slideParts = from item in openXmlElementList
                                      select (SlidePart)presentationPart.GetPartById((item as SlideId).RelationshipId);
+
                     // Retrieve the text of each slidePart.  
                     var slideText = from item in slideParts
-                                    select (GetSlideText(item));
+                                    select GetSlideText(item);
 
                     result.AddRange(TempData.GetTempDataIEnumerable(StorageType.TextType, slideText));
                     Stream stream = null;
                     byte[] streamByteArray = null;
+
                     // Find image and add to the result.
                     foreach (var slide in slideParts)
                     {
@@ -62,6 +75,7 @@ namespace ShareDataService
                             return new TempData { StorageType = StorageType.ImageType, Data = Convert.ToBase64String(streamByteArray) };
                         }).ToArray());
                     }
+
                     return result.ToArray();
                 }
             }
@@ -81,9 +95,9 @@ namespace ShareDataService
             XDocument xDoc = XDocument.Load(XmlReader.Create(slidePart.GetStream()));
             if (xDoc == null)
             {
-                return "";
+                return string.Empty;
             }
-            return string.Join("", xDoc.Root.Descendants(PowerpointmlNamespace + "t").Select(m => (string)m));
+            return string.Join(string.Empty, xDoc.Root.Descendants(powerpointmlNamespace + "t").Select(m => (string)m));
         }
 
     }

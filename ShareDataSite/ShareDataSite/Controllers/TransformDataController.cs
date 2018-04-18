@@ -35,11 +35,12 @@ namespace ShareDataSite.Controllers
             }
             catch (Exception)
             {
-                return String.Empty;
+                return string.Empty;
             }
 
             string accessToken = inputOjbect.AccessToken;
             string fileId = inputOjbect.FileId;
+
             // Download the file in Onedrive.
             var webclient = new WebClient();
             byte[] data = webclient.DownloadData(downloadUri);
@@ -62,7 +63,7 @@ namespace ShareDataSite.Controllers
             }
             else
             {
-                return String.Empty;
+                return string.Empty;
             }
 
             return parse.TempDataToHtmlAndUploadToOneDrive();
