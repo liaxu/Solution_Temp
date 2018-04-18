@@ -145,7 +145,7 @@ Office.initialize = function () {
     })
 }
 
-
+//convert hash string to Object
 $.hashParam = function (hashstr) {
     var hash = hashstr.split("&");
     var params = {}
@@ -155,7 +155,7 @@ $.hashParam = function (hashstr) {
     }
     return params;
 }
-
+//package some request method
 var common = function () {
     //get row number and file from stack
     function codeRowNum(depth) {
@@ -198,12 +198,11 @@ var common = function () {
     }
 
     function request(url, data, method, isLogin) {
-        var that = this;
         var stack = codeRowNum(3);
 
         if (!method && typeof data === "string")
             method = data, data = null;
-
+        //use Promise to handle async process
         var promise = new Promise(function (resolve, reject) {
             var option = {
                 url: url,

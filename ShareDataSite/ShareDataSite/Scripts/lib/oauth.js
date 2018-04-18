@@ -3,15 +3,15 @@
 }
 
 $.graph.prototype.login = function (token, authorization, expire_time) {
-    if (token && authorization) {//called from 
+    if (token && authorization) {//called from microsoft authentication in dialog
         expire_time = new Date();
         expire_time.setSeconds(expire_time.getSeconds() + authorization.expires_in);
         expire_time = expire_time.toUTCString();
         window.sessionStorage.token = token;
         window.sessionStorage.authorization = JSON.stringify(authorization);
         window.sessionStorage.expire_time = expire_time;
-    } else {
-        if (window.sessionStorage.authorization) {
+    } else {//call when page loaded
+        if (window.sessionStorage.authorization) {//logined and token saved in sessionStorage
             authorization = JSON.parse(window.sessionStorage.authorization);
             token = authorization.access_token;
             expire_time = window.sessionStorage.expire_time;
@@ -23,6 +23,7 @@ $.graph.prototype.login = function (token, authorization, expire_time) {
     this.token = token;
     this.authorization = authorization;
     this.expire_time = expire_time;
+    //auto refresh token
     setTimeout(this.refreshToken.bind(this), function () {
         var span = new Date(this.expire_time) - new Date();
         return ((span - 1000000) < 0 ? 0 : (span - 1000000));
@@ -34,7 +35,7 @@ $.graph.prototype.refreshToken = function () {
     var that = this;
     if (!(this.authorization && this.authorization.refresh_token))
         throw "no authorization or refresh_token set";
-
+    //refresh in backend
     $.ajax({
         url: "/Authorization/RefreshToken",
         data: { refresh_token: this.authorization.refresh_token },
@@ -50,11 +51,12 @@ $.graph.prototype.refreshToken = function () {
 }
 
 $.graph.login = function (setting) {
+    //intialize graph
     var graph = window.graph = new $.graph(setting);
     var _dlg;
 
     return function (callback) {
-        //intialize graph
+        //login from sessionStorge or microsoft authentication endpoint
         if (graph.login()) {
             callback(true);
         } else {
@@ -66,6 +68,7 @@ $.graph.login = function (setting) {
                     _dlg = result.value;
                     _dlg.addEventHandler(Microsoft.Office.WebExtension.EventType.DialogMessageReceived, function (msg) {
                         var authorization = $.hashParam(msg.message);
+                        //achieve authentication in backend
                         $.ajax({
                             url: "/Authorization/Code",
                             data: {
