@@ -42,6 +42,18 @@
                 padding: 16px;
                 border-bottom: thin dotted #808080;
             }
+
+        table td {
+            border: 1px solid #999;
+            width: 80px;
+            height: 40px;
+            margin: 10px;
+        }
+
+        td.selected {
+            background-color: #85be09;
+        }
+
     </style>
 }
 <div style="padding:16px;background-color:#f3f3f3;">
@@ -75,6 +87,12 @@
     </div>
 </div>
 <script>
+
+    var isMouseDown = false;
+    var startRowIndex = null;
+    var startCellIndex = null;
+
+
     var closedialog = function () {
         $(".windowmask").hide();
         $(".dialogcontainer").hide();
@@ -84,6 +102,37 @@
         $(".dialogcontainer").css({ "display": "flex" });
         $(".dialog .content").html(content);
     }
+
+    var selectTo = function (table, cell) {
+
+        var row = cell.parent();
+        var cellIndex = cell.index();
+        var rowIndex = row.index();
+        var rowStart, rowEnd, cellStart, cellEnd;
+
+        if (rowIndex < startRowIndex) {
+            rowStart = rowIndex;
+            rowEnd = startRowIndex;
+        } else {
+            rowStart = startRowIndex;
+            rowEnd = rowIndex;
+        }
+
+        if (cellIndex < startCellIndex) {
+            cellStart = cellIndex;
+            cellEnd = startCellIndex;
+        } else {
+            cellStart = startCellIndex;
+            cellEnd = cellIndex;
+        }
+        for (var i = rowStart; i <= rowEnd; i++) {
+            var rowCells = table.find("tr").eq(i).find("td");
+            for (var j = cellStart; j <= cellEnd; j++) {
+                rowCells.eq(j).addClass("selected");
+            }
+        }
+    }
+
 
     var fileListVM = new Vue({
         el: "#filelist",
@@ -105,6 +154,57 @@
                     method: "get",
                     success: function (data) {
                         showdialog(data);
+
+                        //Get table selected area content
+                        var alltable = $(".table");
+                        alltable.find("td").mousedown(function (e) {
+                            var table = $(this).parent().parent().parent();
+                            isMouseDown = true;
+                            table.prev().css("display", "block");
+                            var cell = $(this);
+                            table.find(".selected").removeClass("selected"); // deselect everything
+                            if (e.shiftKey) {
+                                selectTo(table, cell);
+                            } else {
+                                cell.addClass("selected");
+                                startCellIndex = cell.index();
+                                startRowIndex = cell.parent().index();
+                            }
+
+                            //insert table buttion click event
+                            table.prev().click(function (e) {
+                                var tableRegion = new Array();
+                                table.find("tr").each(function () {
+                                    var rowArray = new Array();
+                                    var rowFlag = false;
+                                    $(this).find("td").each(function () {
+                                        if ($(this).hasClass("selected")) {
+                                            rowArray.push($(this).text());
+                                            rowFlag = true;
+                                        }
+                                    });
+                                    if (rowFlag) {
+                                        tableRegion.push(rowArray);
+                                    }
+                                });
+                                console.log(tableRegion);
+                                app.insertTable(tableRegion, null);
+
+                            });
+
+                            return false; // prevent text selection
+                        })
+                            .mouseover(function () {
+                                if (!isMouseDown) return;
+                                var table = $(this).parent().parent().parent();
+                                table.find(".selected").removeClass("selected");
+                                selectTo(table, $(this));
+                            })
+                            .bind("selectstart", function () {
+                                return false;
+                            });
+
+
                         $(".dialog").find(".base.text").click(function () {
                             app.insertText($(this).text());
                         });
@@ -128,4 +228,9 @@
     app.ready(function (graph) {
         fileListVM.getOneDriveRawFileList();
     })
+
+    $(document).mouseup(function () {
+        isMouseDown = false;
+    });
+
 </script>
