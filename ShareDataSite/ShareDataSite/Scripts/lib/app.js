@@ -68,36 +68,6 @@ Office.initialize = function () {
 
                     var tableWidth = tableBody ? tableBody.length ? tableBody[0].length : 0 : 0;
                     var tableLength = tableBody.length;
-                 
-                    function convert26BSToDS(code) {
-                        var num = -1;
-                        var reg = /^[A-Z]+$/g;
-                        if (!reg.test(code)) {
-                            return num;
-                        }
-                        num = 0;
-                        for (var i = code.length - 1, j = 1; i >= 0; i-- , j *= 26) {
-                            num += (code[i].charCodeAt() - 64) * j;
-                        }
-                        return num;
-                    }
-
-                    function convertDSTo26BS(num) {
-                        var code = '';
-                        var reg = /^\d+$/g;
-                        if (!reg.test(num)) {
-                            return code;
-                        }
-                        while (num > 0) {
-                            var m = num % 26
-                            if (m == 0) {
-                                m = 26;
-                            }
-                            code = String.fromCharCode(64 + parseInt(m)) + code;
-                            num = (num - m) / 26;
-                        }
-                        return code;
-                    }
 
                     return context.sync().then(function () {
                         var address = function () {
@@ -143,6 +113,37 @@ Office.initialize = function () {
             }, 3000);
         }
     })
+
+
+    function convert26BSToDS(code) {
+        var num = -1;
+        var reg = /^[A-Z]+$/g;
+        if (!reg.test(code)) {
+            return num;
+        }
+        num = 0;
+        for (var i = code.length - 1, j = 1; i >= 0; i-- , j *= 26) {
+            num += (code[i].charCodeAt() - 64) * j;
+        }
+        return num;
+    }
+
+    function convertDSTo26BS(num) {
+        var code = '';
+        var reg = /^\d+$/g;
+        if (!reg.test(num)) {
+            return code;
+        }
+        while (num > 0) {
+            var m = num % 26
+            if (m == 0) {
+                m = 26;
+            }
+            code = String.fromCharCode(64 + parseInt(m)) + code;
+            num = (num - m) / 26;
+        }
+        return code;
+    }
 }
 
 //convert hash string to Object

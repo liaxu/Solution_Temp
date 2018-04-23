@@ -157,9 +157,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\image\psb.jpg" />
-    <Content Include="Content\scripts\bluebird.js" />
-    <Content Include="Content\scripts\index.js" />
-    <Content Include="Content\scripts\jquery.min.js" />
+    <Content Include="Scripts\bluebird.js" />
+    <Content Include="Scripts\index.js" />
+    <Content Include="Scripts\jquery.min.js" />
     <Content Include="Content\Site.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
