@@ -6,8 +6,8 @@
     <ProjectGuid>{CC1160BB-2E3D-4A0D-A858-D2988A58C6C8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WordWebAddIn1</RootNamespace>
-    <AssemblyName>WordWebAddIn1</AssemblyName>
+    <RootNamespace>WordAddIn</RootNamespace>
+    <AssemblyName>WordAddIn</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <TargetOfficeVersion>15.0</TargetOfficeVersion>
     <FileAlignment>512</FileAlignment>
@@ -43,10 +43,10 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="WordWebAddIn1Manifest\SharePointProjectItem.spdata">
+    <None Include="WordAddInManifest\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{85a919c0-82f0-4460-99f2-04e8ba0873f2}</SharePointProjectItemId>
     </None>
-    <Content Include="WordWebAddIn1Manifest\WordWebAddIn1.xml">
+    <Content Include="WordAddInManifest\WordAddIn.xml">
       <OpcRelationship>manifest-oemanifest</OpcRelationship>
     </Content>
   </ItemGroup>

@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShareDataSite", "ShareDataS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShareDataService", "ShareDataService\ShareDataService.csproj", "{3B453DCC-1422-416E-AB05-AEE96993164C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordWebAddIn1", "WordWebAddIn1\WordWebAddIn1.csproj", "{CC1160BB-2E3D-4A0D-A858-D2988A58C6C8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordAddIn", "WordAddIn\WordAddIn.csproj", "{CC1160BB-2E3D-4A0D-A858-D2988A58C6C8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PowerPointAddIn", "PowerPointAddIn\PowerPointAddIn.csproj", "{5EDD33DD-C933-4BD6-9C93-D9D3D2E073FE}"
 EndProject

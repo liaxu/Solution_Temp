@@ -4,7 +4,7 @@
           xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" 
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
           xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0" 
-          xsi:type="ContentApp">
+          xsi:type="TaskPaneApp">
 
   <!-- Begin Basic Settings: Add-in metadata, used for all versions of Office unless override provided. -->
 
@@ -35,8 +35,8 @@
   </Hosts>
   <DefaultSettings>
     <SourceLocation DefaultValue="~remoteAppUrl/" />
-    <RequestedWidth>400</RequestedWidth>
-    <RequestedHeight>400</RequestedHeight>
+    <!--<RequestedWidth>400</RequestedWidth>-->
+    <!--<RequestedHeight>400</RequestedHeight>-->
   </DefaultSettings>
 
   <Permissions>ReadWriteDocument</Permissions>
