@@ -148,7 +148,9 @@
             getOneDriveFileList: function () {
                 var self = this;
                 var prefixUrl = "https://graph.microsoft.com/v1.0/me/drive/root";
-                GetFiles(prefixUrl, self.fileList);
+                GetFiles(prefixUrl).then(function (data) {
+                    self.fileList = data;
+                });
             },
             generateRaw: function (path, id) {
                 console.log("file path: " + path);

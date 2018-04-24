@@ -31,6 +31,7 @@
         img {
             max-width: 100%;
         }
+
         .filelist ul {
             text-decoration: none;
             margin: 0;
@@ -53,7 +54,6 @@
         td.selected {
             background-color: #85be09;
         }
-
     </style>
 }
 <div style="padding:16px;background-color:#f3f3f3;">
@@ -144,11 +144,13 @@
             getOneDriveRawFileList: function () {
                 var self = this;
                 var prefixUrl = "https://graph.microsoft.com/v1.0/me/drive/root:/shareddataapp/rawdata:";
-                GetRawFiles(prefixUrl, self.fileList);
+                GetRawFiles(prefixUrl).then(function (data) {
+                    self.fileList = data;
+                });
             },
             showRaw: function (path) {
                 console.log("file path: " + path);
-               
+
                 $.ajax({
                     url: path,
                     method: "get",
