@@ -84,7 +84,9 @@ namespace ShareDataService
                         result += "<div class=\"base image\"><img src=\"data:image/png;base64, " + tempData.Data + "\"/></div>";
                         break;
                     case StorageType.TableType:
-                        result += "<div class=\"table-responsive\"><button style=\"display:none\">Insert Table</button><table class=\"table\"><tbody>" + tempData.Data + @"</tbody></table></div>";
+                        result += "<div class=\"table-responsive\"><button class=\"ms-Button ms-Button--small\" style='display:none;'>" +
+                                "<span class=\"ms-Button-label\">Insert</span>" +
+                                "</button><table class=\"table\"><tbody>" + tempData.Data + @"</tbody></table></div>";
                         break;
                     default:
                         break;

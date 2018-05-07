@@ -4,6 +4,22 @@
 
 @section Script{
     <style>
+        .table-responsive {
+            margin-top: .5em;
+            padding: .5em;
+        }
+
+            .table-responsive .ms-Button {
+                background: #d0d0d0;
+            }
+
+        .ms-ListItem-image img {
+            width: 48px;
+            height: 48px;
+            display: block;
+            margin: 6px auto;
+        }
+
         .func {
             position: absolute;
             top: 11px;
@@ -67,10 +83,11 @@
         .btnlist {
             display: flex;
             justify-content: center;
-            margin-bottom:0.5em;
+            margin-bottom: 0.5em;
         }
-        .image.hidden{
-            display:none;
+
+        .image.hidden {
+            display: none;
         }
     </style>
 }
@@ -152,20 +169,16 @@
                 content.append(html);
                 showTopBorder();
                 var ButtonElements = document.querySelectorAll(".ms-Button");
-                for (var i = 0; i < ButtonElements.length; i++) {
-                    new fabric['Button'](ButtonElements[i], function () {
-                        if ($(this).hasClass("ms-Button--primary")) {
-                            $(this).removeClass("ms-Button--primary")
-                            $("." + $(this).data("type"), "#dialogcontainer").addClass("hidden");
-                        } else {
-                            $(this).addClass("ms-Button--primary")
-                            $("." + $(this).data("type"), "#dialogcontainer").removeClass("hidden");
-                        }
-                        showTopBorder();
-                    });
-                }
-
-
+                $(".ms-Button", ".btnlist").click(function () {
+                    if ($(this).hasClass("ms-Button--primary")) {
+                        $(this).removeClass("ms-Button--primary")
+                        $("." + $(this).data("type"), "#dialogcontainer").addClass("hidden");
+                    } else {
+                        $(this).addClass("ms-Button--primary")
+                        $("." + $(this).data("type"), "#dialogcontainer").removeClass("hidden");
+                    }
+                    showTopBorder();
+                })
             }
         }
     }
