@@ -91,41 +91,41 @@ namespace ShareDataService
                 }
             }
 
-            // Convert raw data to stream objects.
-            var fileStream = GenerateStreamFromString(result);
+            //// Convert raw data to stream objects.
+            //var fileStream = GenerateStreamFromString(result);
 
-            // Judgment file stream content length greater than 4MB use UploadBigFileToOneDrive method, otherwise use UploadSmallFileToOneDrive method.
-            if (new byte[fileStream.Length].Length < (4 * 1024 * 1024))
-            {
-                this.UploadFileMethod = UploadFileToOneDrive.UploadSmallFileToOneDrive;
-            }
-            else
-            {
-                this.UploadFileMethod = UploadFileToOneDrive.UploadBigFileToOneDrive;
-            }
+            //// Judgment file stream content length greater than 4MB use UploadBigFileToOneDrive method, otherwise use UploadSmallFileToOneDrive method.
+            //if (new byte[fileStream.Length].Length < (4 * 1024 * 1024))
+            //{
+            //    this.UploadFileMethod = UploadFileToOneDrive.UploadSmallFileToOneDrive;
+            //}
+            //else
+            //{
+            //    this.UploadFileMethod = UploadFileToOneDrive.UploadBigFileToOneDrive;
+            //}
 
-            var fileName = RawDataPath;
+            //var fileName = RawDataPath;
 
-            try
-            {
-                GraphServiceClient graphServiceClient = new GraphServiceClient(EndpointBase,
-                        new DelegateAuthenticationProvider(
-                           async (requestMessage) =>
-                            {
-                                requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", this.AccessToken);
-                            }));
+            //try
+            //{
+            //    GraphServiceClient graphServiceClient = new GraphServiceClient(EndpointBase,
+            //            new DelegateAuthenticationProvider(
+            //               async (requestMessage) =>
+            //                {
+            //                    requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", this.AccessToken);
+            //                }));
 
-                var itemResponse = graphServiceClient.Me.Drive.Items[FileId].Request().GetAsync();
-                fileName += itemResponse.Result.Name + ".rawdata";
-            }
-            catch (Exception ex)
-            {
-                fileName += "noname.rawdata";
-                throw ex;
-            }
+            //    var itemResponse = graphServiceClient.Me.Drive.Items[FileId].Request().GetAsync();
+            //    fileName += itemResponse.Result.Name + ".rawdata";
+            //}
+            //catch (Exception ex)
+            //{
+            //    fileName += "noname.rawdata";
+            //    throw ex;
+            //}
 
-            // Call upload method.
-            UploadFileMethod(AccessToken, fileStream, fileName, EndpointBase);
+            //// Call upload method.
+            //UploadFileMethod(AccessToken, fileStream, fileName, EndpointBase);
             return result;
         }
 

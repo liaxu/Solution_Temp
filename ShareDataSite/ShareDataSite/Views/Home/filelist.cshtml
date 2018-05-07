@@ -3,8 +3,6 @@
 }
 
 @section Script{
-    <script type="text/javascript" src="~/Content/scripts/graph-api-selected.js"></script>
-    <script type="text/javascript" src="~/Content/scripts/graph-api-list.js"></script>
     <style>
         .func {
             position: absolute;
@@ -61,52 +59,102 @@
         }
     </style>
 }
-<div style="padding:16px;background-color:#f3f3f3;">
-    <div>
-        <span style="font-size:16px;">DATA SHARE DEMO</span>
+<div class="page spa-left">
+    <div style="padding:16px;background-color:#f3f3f3;">
+        <div>
+            <span style="font-size:16px;">DATA SHARE DEMO</span>
+        </div>
     </div>
-    <div style="text-align:right;">
-        <a href="/rawlist"><span>RAW File List</span></a>
+    <div class="filelist" style="margin-top:16px;" id="filelist">
+
+        <ul>
+            @*<li v-for="f in fileList">
+                    <div>
+                        <span>{{f.Name}}</span>
+                    </div>
+                    <div><a href="javascript:void(0)" v-on:click="generateRaw(f.DownloadPath,f.Id)">Get Raw data</a></div>
+                    <div style="margin-top:16px;max-width:100%;padding-right:100px;text-overflow: ellipsis;overflow-x:hidden;">
+                        <span style="display:block;font-size:0.8em;color:#808080">{{f.Path}}</span>
+                    </div>
+                    <div>
+                        <span style="display:block;font-size:0.8em;color:#808080">{{transDateTime(f.CreatedDateTime)}}</span>
+                    </div>
+                </li>*@
+            <li class="ms-ListItem ms-ListItem--image" v-for="f in fileList" v-on:click="generateRaw(f.DownloadPath,f.Id)">
+                <div class="ms-ListItem-image" style="background:none;"><img src="https://static2.sharepointonline.com/files/fabric/assets/brand-icons/product/png/word_32x2.png" alt="Word logo"></div>
+                <span class="ms-ListItem-primaryText">{{f.Name}}</span>
+                <span class="ms-ListItem-secondaryText">{{transDateTime(f.CreatedDateTime)}}</span>
+                <span class="ms-ListItem-tertiaryText">{{f.Path}}</span>
+                <div class="ms-ListItem-selectionTarget"></div>
+            </li>
+        </ul>
     </div>
 </div>
-<div class="filelist" style="margin-top:16px;" id="filelist">
-    <ul>
-        <li v-for="f in fileList">
-            <div>
-                <span>{{f.Name}}</span>
+<div id="dialogcontainer" class="page spa-right hidden" style="background: white;overflow-y:auto;">
+    <div class="content" style="position:absolute;top:40px;left:0;right:0;bottom:0;overflow-y:auto;">
+
+    </div>
+    <div id="mesh" class="mesh" style="width:100%;height:100%;position:absolute;top:0;left:0;background:rgba(147, 147, 147, 0.71);">
+        <div style="margin:200px auto;width:120px;">
+            <div class="ms-Spinner ms-Spinner--large">
+                <div class="ms-Spinner-label">
+                    Loading...
+                </div>
             </div>
-            <div><a href="javascript:void(0)" v-on:click="generateRaw(f.DownloadPath,f.Id)">Get Raw data</a></div>
-            <div style="margin-top:16px;max-width:100%;padding-right:100px;text-overflow: ellipsis;overflow-x:hidden;">
-                <span style="display:block;font-size:0.8em;color:#808080">{{f.Path}}</span>
-            </div>
-            <div>
-                <span style="display:block;font-size:0.8em;color:#808080">{{transDateTime(f.CreatedDateTime)}}</span>
-            </div>
-        </li>
-    </ul>
-</div>
-<div class="windowmask" style="z-index:2000;display:none;position:fixed;top:0;left:0;right:0;bottom:0;background-color:#000000;opacity:0.6"></div>
-<div class="dialogcontainer" style="z-index:2000;position:fixed;top:0;left:0;right:0;bottom:0;display:none;flex-direction:column;justify-content:center;align-items:center;">
-    <div class="dialog" style="position:relative;width:95%;height:95%;background-color:#ffffff;">
-        <div class="content" style="position:absolute;top:40px;left:0;right:0;bottom:0;overflow-y:auto;"></div>
-        <span style="color:#000000;position:absolute;top:10px;right:16px;cursor:pointer;" onclick="closedialog()">[close]</span>
+        </div>
     </div>
 </div>
+<script id="checkButton" type="text/html">
+    <a class="ms-Link" href="javascript:closedialog()" title="More info about Example Link">BackToList</a>
+    <br />
+    <button class="ms-Button ms-Button--primary" data-type="text">
+        <span class="ms-Button-label">Text</span>
+    </button>
+    <button class="ms-Button ms-Button--primary" data-type="image">
+        <span class="ms-Button-label">Image</span>
+    </button>
+    <button class="ms-Button ms-Button--primary" data-type="table">
+        <span class="ms-Button-label">Table</span>
+    </button>
+    <script>
+        var ButtonElements = document.querySelectorAll(".ms-Button");
+        for (var i = 0; i < ButtonElements.length; i++) {
+            new fabric['Button'](ButtonElements[i], function () {
+                // Insert Event Here
+                if ($(this).hasClass("ms-Button--primary")) {
+                    $(this).removeClass("ms-Button--primary")
+                    $($(this).data("type"), "#dialogcontainer").hide();
+                } else {
+                    $(this).addClass("ms-Button--primary")
+                    $($(this).data("type"), "#dialogcontainer").show();
+                }
+            });
+        }
+    </script>
+</script>
 <script>
     var isMouseDown = false;
     var startRowIndex = null;
     var startCellIndex = null;
 
     var closedialog = function () {
-        $(".windowmask").hide();
-        $(".dialogcontainer").hide();
+        $("#dialogcontainer").removeClass("slideIn");
+        $("#dialogcontainer").addClass("slideOut");
     }
-    var showdialog = function (content) {
-        $(".windowmask").show();
-        $(".dialogcontainer").css({ "display": "flex" });
-        $(".dialog .content").html(content);
+    var showdialog = function () {
+        $("#dialogcontainer").addClass("slideIn");
+        $("#dialogcontainer").removeClass("slideOut").removeClass("hidden");
+        var content = $(".content", "#dialogcontainer");
+        content.html();
+        $("#mesh").show();
+        return {
+            load: function (html) {
+                $("#mesh").hide();
+                content.append($("#checkButton").html());
+                content.append(html);
+            }
+        }
     }
-
 
     var selectTo = function (table, cell) {
 
@@ -153,6 +201,7 @@
                 });
             },
             generateRaw: function (path, id) {
+                var _dia = showdialog();
                 console.log("file path: " + path);
                 var data = {};
                 data.accessToken = sessionStorage.token;
@@ -161,8 +210,10 @@
                     url: "/api/getrawdata?downloadUri={0}".format(path),
                     method: "post",
                     data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "text",
                     success: function (data) {
-                        showdialog(data);
+                        _dia.load(data);
                         //Get table selected area content
                         var alltable = $(".table");
                         alltable.find("td").mousedown(function (e) {
@@ -172,7 +223,7 @@
                             var cell = $(this);
                             table.find(".selected").removeClass("selected"); // deselect everything
                             if (e.shiftKey) {
-                                selectTo(table,cell);
+                                selectTo(table, cell);
                             } else {
                                 cell.addClass("selected");
                                 startCellIndex = cell.index();
@@ -206,7 +257,7 @@
                                 if (!isMouseDown) return;
                                 var table = $(this).parent().parent().parent();
                                 table.find(".selected").removeClass("selected");
-                                selectTo(table,$(this));
+                                selectTo(table, $(this));
                             })
                             .bind("selectstart", function () {
                                 return false;
@@ -238,12 +289,11 @@
                         });
                     },
                     error: function (error) {
+                        closedialog();
                     },
                     complete: function (data) {
 
                     },
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "text"
                 });
             },
             transDateTime: transDateTime,
@@ -251,6 +301,11 @@
     });
     app.ready(function (graph) {
         fileListVM.getOneDriveFileList();
+        //spinner initialize
+        var SpinnerElements = document.querySelectorAll(".ms-Spinner");
+        for (var i = 0; i < SpinnerElements.length; i++) {
+            new fabric['Spinner'](SpinnerElements[i]);
+        }
     })
 
     $(document).mouseup(function () {

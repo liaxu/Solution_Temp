@@ -116,7 +116,7 @@ function GetFiles(prefixUrl) {
         //concat all promise result to one array
         then(function (data) {
             var res = [];
-            res = [].map.call(data, function (item) {
+            [].map.call(data, function (item) {
                 res = res.concat(item);
             });
             return res;
