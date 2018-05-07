@@ -49,15 +49,15 @@ namespace ShareDataSite.Controllers
             var fileName = webclient.ResponseHeaders.GetValues("Content-Disposition").FirstOrDefault();
 
             var parse = new WriteRawDataToFile();
-            if (fileName.ToLower().EndsWith(".doc") || fileName.ToLower().EndsWith(".docx"))
+            if (fileName.ToLower().Contains(".doc") || fileName.ToLower().Contains(".docx"))
             {
                 parse = new WordParse(data, accessToken, fileId);
             }
-            else if (fileName.ToLower().EndsWith(".xls") || fileName.ToLower().EndsWith(".xlsx"))
+            else if (fileName.ToLower().Contains(".xls") || fileName.ToLower().Contains(".xlsx"))
             {
                 parse = new ExcelParse(data, accessToken, fileId);
             }
-            else if (fileName.ToLower().EndsWith(".ppt") || fileName.ToLower().EndsWith(".pptx"))
+            else if (fileName.ToLower().Contains(".ppt") || fileName.ToLower().Contains(".pptx"))
             {
                 parse = new PowerPointParse(data, accessToken, fileId);
             }

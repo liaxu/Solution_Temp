@@ -11,14 +11,17 @@
         }
 
         .base {
-            border: 1px dotted #03c;
+            border-bottom: 1px solid #d0d0d0;
             padding: 16px;
-            margin-bottom: 16px;
             cursor: pointer;
         }
 
+            .base.top {
+                border-top: 1px solid #d0d0d0;
+            }
+
             .base:hover {
-                background: #f8f5a9;
+                background: #d0d0d0;
             }
 
         .text {
@@ -32,8 +35,6 @@
         img {
             max-width: 100%;
         }
-
-
 
         .filelist ul {
             text-decoration: none;
@@ -57,6 +58,20 @@
         td.selected {
             background-color: #85be09;
         }
+
+        .ms-Link {
+            display: block;
+            margin: .5em;
+        }
+
+        .btnlist {
+            display: flex;
+            justify-content: center;
+            margin-bottom:0.5em;
+        }
+        .image.hidden{
+            display:none;
+        }
     </style>
 }
 <div class="page spa-left">
@@ -67,20 +82,8 @@
     </div>
     <div class="filelist" style="margin-top:16px;" id="filelist">
         <ul>
-            @*<li v-for="f in fileList">
-                    <div>
-                        <span>{{f.Name}}</span>
-                    </div>
-                    <div><a href="javascript:void(0)" v-on:click="generateRaw(f.DownloadPath,f.Id)">Get Raw data</a></div>
-                    <div style="margin-top:16px;max-width:100%;padding-right:100px;text-overflow: ellipsis;overflow-x:hidden;">
-                        <span style="display:block;font-size:0.8em;color:#808080">{{f.Path}}</span>
-                    </div>
-                    <div>
-                        <span style="display:block;font-size:0.8em;color:#808080">{{transDateTime(f.CreatedDateTime)}}</span>
-                    </div>
-                </li>*@
             <li class="ms-ListItem ms-ListItem--image" v-for="f in fileList" v-on:click="generateRaw(f.DownloadPath,f.Id)">
-                <div class="ms-ListItem-image" style="background:none;width:60px;height:60px;">
+                <div class="ms-ListItem-image" style="background:none;">
                     <img v-if="f.Name.endsWith('.doc')||f.Name.endsWith('.docx')" src="~/Content/image/word_32x2.png" alt="Word logo">
                     <img v-if="f.Name.endsWith('.xls')||f.Name.endsWith('.xlsx')" src="~/Content/image/excel_32x2.png" alt="Excel logo">
                     <img v-if="f.Name.endsWith('.ppt')||f.Name.endsWith('.pptx')" src="~/Content/image/powerpoint_32x2.png" alt="PowerPoint logo">
@@ -94,7 +97,8 @@
     </div>
 </div>
 <div id="dialogcontainer" class="page spa-right hidden" style="background: white;overflow-y:auto;">
-    <div class="content" style="position:absolute;top:40px;left:0;right:0;bottom:0;overflow-y:auto;">
+    <a class="ms-Link" href="javascript:closedialog()" title="More info about Example Link">BackToList</a>
+    <div class="content" style="position:absolute;top:30px;left:0;right:0;bottom:0;overflow-y:auto;">
 
     </div>
     <div id="mesh" class="mesh" style="width:100%;height:100%;position:absolute;top:0;left:0;background:rgba(147, 147, 147, 0.71);">
@@ -108,32 +112,17 @@
     </div>
 </div>
 <script id="checkButton" type="text/html">
-    <a class="ms-Link" href="javascript:closedialog()" title="More info about Example Link">BackToList</a>
-    <br />
-    <button class="ms-Button ms-Button--primary" data-type="text">
-        <span class="ms-Button-label">Text</span>
-    </button>
-    <button class="ms-Button ms-Button--primary" data-type="image">
-        <span class="ms-Button-label">Image</span>
-    </button>
-    <button class="ms-Button ms-Button--primary" data-type="table">
-        <span class="ms-Button-label">Table</span>
-    </button>
-    <script>
-        var ButtonElements = document.querySelectorAll(".ms-Button");
-        for (var i = 0; i < ButtonElements.length; i++) {
-            new fabric['Button'](ButtonElements[i], function () {
-                // Insert Event Here
-                if ($(this).hasClass("ms-Button--primary")) {
-                    $(this).removeClass("ms-Button--primary")
-                    $($(this).data("type"), "#dialogcontainer").hide();
-                } else {
-                    $(this).addClass("ms-Button--primary")
-                    $($(this).data("type"), "#dialogcontainer").show();
-                }
-            });
-        }
-    </script>
+    <div class="btnlist">
+        <button class="ms-Button ms-Button--primary" data-type="text">
+            <span class="ms-Button-label">Text</span>
+        </button>
+        <button class="ms-Button ms-Button--primary" data-type="image">
+            <span class="ms-Button-label">Image</span>
+        </button>
+        <button class="ms-Button ms-Button--primary" data-type="table">
+            <span class="ms-Button-label">Table</span>
+        </button>
+    </div>
 </script>
 <script>
     var isMouseDown = false;
@@ -148,13 +137,35 @@
         $("#dialogcontainer").addClass("slideIn");
         $("#dialogcontainer").removeClass("slideOut").removeClass("hidden");
         var content = $(".content", "#dialogcontainer");
-        content.html();
+        content.html("");
         $("#mesh").show();
+
+        function showTopBorder() {
+            $(".text", content).removeClass("top");
+            $(".text", content).not(".hidden").eq(0).addClass("top")
+        }
+
         return {
             load: function (html) {
                 $("#mesh").hide();
                 content.append($("#checkButton").html());
                 content.append(html);
+                showTopBorder();
+                var ButtonElements = document.querySelectorAll(".ms-Button");
+                for (var i = 0; i < ButtonElements.length; i++) {
+                    new fabric['Button'](ButtonElements[i], function () {
+                        if ($(this).hasClass("ms-Button--primary")) {
+                            $(this).removeClass("ms-Button--primary")
+                            $("." + $(this).data("type"), "#dialogcontainer").addClass("hidden");
+                        } else {
+                            $(this).addClass("ms-Button--primary")
+                            $("." + $(this).data("type"), "#dialogcontainer").removeClass("hidden");
+                        }
+                        showTopBorder();
+                    });
+                }
+
+
             }
         }
     }
