@@ -156,7 +156,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\image\excel_32x2.png" />
+    <Content Include="Content\image\powerpoint_32x2.png" />
     <Content Include="Content\image\psb.jpg" />
+    <Content Include="Content\image\word_32x2.png" />
     <Content Include="Scripts\bluebird.js" />
     <Content Include="Scripts\index.js" />
     <Content Include="Scripts\jquery.min.js" />

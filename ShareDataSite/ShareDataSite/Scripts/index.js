@@ -89,7 +89,7 @@ function GetFiles(prefixUrl) {
             var promises = [], data = [];
             $.each(that.res.value, function (i, item) {
                 if (item["@microsoft.graph.downloadUrl"] &&
-                    (item.name.endsWith(".pptx") || item.name.endsWith(".docx") || item.name.endsWith(".xlsx"))) {
+                    (item.name.endsWith(".pptx") || item.name.endsWith(".ppt") || item.name.endsWith(".docx") || item.name.endsWith(".doc") || item.name.endsWith(".xlsx") || item.name.endsWith(".xls"))) {
                     var object = {
                         Id: item.id,
                         Name: item.name,
