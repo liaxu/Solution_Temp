@@ -23,7 +23,6 @@ namespace ShareDataSite.Controllers
         public string GetHtmlAfterTransformData()
         {
             // Get Onedrive file download address.
-            string downloadUri = this.Request.QueryString["downloaduri"];
 
             Stream req = Request.InputStream;
             req.Seek(0, SeekOrigin.Begin);
@@ -38,6 +37,7 @@ namespace ShareDataSite.Controllers
                 return string.Empty;
             }
 
+            string downloadUri = inputOjbect.Downloaduri;
             string accessToken = inputOjbect.AccessToken;
             string fileId = inputOjbect.FileId;
 

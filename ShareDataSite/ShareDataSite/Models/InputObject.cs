@@ -14,5 +14,6 @@
         /// File id in OneDrive.
         /// </summary>
         public string FileId { get; set; }
+        public string Downloaduri { get; set; }
     }
 }

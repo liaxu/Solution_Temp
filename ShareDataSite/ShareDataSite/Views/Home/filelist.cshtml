@@ -232,9 +232,10 @@
                 console.log("file path: " + path);
                 var data = {};
                 data.accessToken = sessionStorage.token;
+                data.downloadUri = path;
                 data.fileId = id;
                 $.ajax({
-                    url: "/api/getrawdata?downloadUri={0}".format(path),
+                    url: "/api/getrawdata",
                     method: "post",
                     data: JSON.stringify(data),
                     contentType: "application/json; charset=utf-8",

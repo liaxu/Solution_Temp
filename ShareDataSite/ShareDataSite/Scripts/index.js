@@ -66,7 +66,7 @@ String.prototype.endsWith = function (pattern) {
 
 $.graph.prototype.GetFileList = function (prefixUrl) {
     //https://docs.microsoft.com/en-us/onedrive/developer/rest-api/api/driveitem_list_children
-
+    prefixUrl = "https://graph.microsoft.com/v1.0/drives/b!zLlbCzerpk2DHYV1N8enee0vlLDbhWFCsm0saPYUzUfPBzobEIGMR6Eb6roPe47Y/root";
     var url = prefixUrl + "/children?select=name,id,webUrl,@microsoft.graph.downloadUrl,createdDateTime,folder,parentReference";
     return common.Request.call(
         this,
