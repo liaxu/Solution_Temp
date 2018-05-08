@@ -10,6 +10,8 @@
 //when Office loaded complete
 Office.initialize = function () {
     var app = window.app;
+    var element = document.querySelector('.ms-MessageBanner');
+    var messageBanner = new fabric.MessageBanner(element);
 
     $(document).ready(function () {
         //call function in app.onready when login success
@@ -112,6 +114,17 @@ Office.initialize = function () {
                 dialog.slideUp();
             }, 3000);
         }
+
+        messageBanner.hideBanner();
+        app.showNotification = function (header, content) {
+            $("#notification-header").text(header);
+            $("#notification-body").text(content);
+            messageBanner.showBanner();
+            messageBanner.toggleExpansion();
+
+            setTimeout(messageBanner.hideBanner, 3000);
+        }
+
     })
 
 

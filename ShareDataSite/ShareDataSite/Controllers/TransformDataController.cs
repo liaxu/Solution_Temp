@@ -69,8 +69,10 @@ namespace ShareDataSite.Controllers
                 }
 
                 return parse.TempDataToHtmlAndUploadToOneDrive();
-            }catch(Exception x)
+            }
+            catch (Exception x)
             {
+                Response.StatusCode = 400;
                 return x.Message;
             }
 

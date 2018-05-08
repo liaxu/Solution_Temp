@@ -318,6 +318,9 @@
                     },
                     error: function (error) {
                         closedialog();
+                        if (error.responseText) {
+                            app.showNotification("Error：", error.responseText);
+                        }
                     },
                     complete: function (data) {
 
