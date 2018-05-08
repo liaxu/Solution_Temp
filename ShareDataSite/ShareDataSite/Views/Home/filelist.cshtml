@@ -43,10 +43,10 @@
         .text {
         }
 
-        .image {
+        /*.image {
             justify-content: center;
             display: flex;
-        }
+        }*/
 
         img {
             max-width: 100%;
@@ -113,7 +113,7 @@
         </ul>
     </div>
 </div>
-<div id="dialogcontainer" class="page spa-right hidden" style="background: white;overflow-y:auto;">
+<div id="dialogcontainer" class="page spa-right hidden" style="background: white;">
     <a class="ms-Link" href="javascript:closedialog()" title="More info about Example Link">&lt;BackToFileList</a>
     <div class="content" style="position:absolute;top:30px;left:0;right:0;bottom:0;overflow-y:auto;">
 
@@ -291,7 +291,7 @@
                                 return false;
                             });
 
-                        $(".dialog").find("button.btn").click(function (e) {
+                        $("#dialogcontainer .content").find("button.btn").click(function (e) {
                             var table = $(this).next("table");
                             var thead = table.find("thead th").map(function () {
                                 return $(this).text();
@@ -308,10 +308,10 @@
                             });
                             app.insertTable(tbody, thead);
                         });
-                        $(".dialog").find(".base.text").click(function () {
+                        $("#dialogcontainer .content").find(".base.text").click(function () {
                             app.insertText($(this).text());
                         });
-                        $(".dialog").find(".base.image").click(function () {
+                        $("#dialogcontainer .content").find(".base.image").click(function () {
                             var base64 = $(this).find("img").attr("src").substring($(this).find("img").attr("src").indexOf(",") + 1);
                             app.insertImage(base64);
                         });

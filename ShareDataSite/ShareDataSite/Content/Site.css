@@ -2,8 +2,11 @@
     display: none;
 }
 
+body {
+    overflow: hidden;
+}
+
 .spa-left, .spa-right {
-    /*padding: 1em;*/
     position: absolute;
     background-color: inherit;
     top: 0;
