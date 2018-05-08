@@ -99,6 +99,11 @@ namespace ShareDataService
                               {
                                   // Find the first paragraph in the table cell.
                                   Paragraph p = cell.Elements<Paragraph>().FirstOrDefault();
+
+                                  if (p == null)
+                                  {
+                                      return "<td></td>";
+                                  }
                                   // Find the first run in the paragraph.
                                   Run r = p.Elements<Run>().FirstOrDefault();
                                   if (r == null)

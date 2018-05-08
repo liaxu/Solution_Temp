@@ -22,51 +22,58 @@ namespace ShareDataSite.Controllers
         [HttpPost]
         public string GetHtmlAfterTransformData()
         {
-            // Get Onedrive file download address.
-
-            Stream req = Request.InputStream;
-            req.Seek(0, SeekOrigin.Begin);
-            string json = new StreamReader(req).ReadToEnd();
-            InputObject inputOjbect = null;
             try
             {
-                inputOjbect = JsonConvert.DeserializeObject<InputObject>(json);
-            }
-            catch (Exception)
+
+                // Get Onedrive file download address.
+                Stream req = Request.InputStream;
+                req.Seek(0, SeekOrigin.Begin);
+                string json = new StreamReader(req).ReadToEnd();
+                InputObject inputOjbect = null;
+                try
+                {
+                    inputOjbect = JsonConvert.DeserializeObject<InputObject>(json);
+                }
+                catch (Exception)
+                {
+                    return string.Empty;
+                }
+
+                string downloadUri = inputOjbect.Downloaduri;
+                string accessToken = inputOjbect.AccessToken;
+                string fileId = inputOjbect.FileId;
+
+                // Download the file in Onedrive.
+                var webclient = new WebClient();
+                byte[] data = webclient.DownloadData(downloadUri);
+
+                // Get the file name.
+                var fileName = webclient.ResponseHeaders.GetValues("Content-Disposition").FirstOrDefault();
+                fileName = fileName.Replace("\"", "");
+                var parse = new WriteRawDataToFile();
+                if (fileName.ToLower().EndsWith(".doc") || fileName.ToLower().EndsWith(".docx"))
+                {
+                    parse = new WordParse(data, accessToken, fileId);
+                }
+                else if (fileName.ToLower().EndsWith(".xls") || fileName.ToLower().EndsWith(".xlsx"))
+                {
+                    parse = new ExcelParse(data, accessToken, fileId);
+                }
+                else if (fileName.ToLower().EndsWith(".ppt") || fileName.ToLower().EndsWith(".pptx"))
+                {
+                    parse = new PowerPointParse(data, accessToken, fileId);
+                }
+                else
+                {
+                    return string.Empty;
+                }
+
+                return parse.TempDataToHtmlAndUploadToOneDrive();
+            }catch(Exception x)
             {
-                return string.Empty;
+                return x.Message;
             }
 
-            string downloadUri = inputOjbect.Downloaduri;
-            string accessToken = inputOjbect.AccessToken;
-            string fileId = inputOjbect.FileId;
-
-            // Download the file in Onedrive.
-            var webclient = new WebClient();
-            byte[] data = webclient.DownloadData(downloadUri);
-
-            // Get the file name.
-            var fileName = webclient.ResponseHeaders.GetValues("Content-Disposition").FirstOrDefault();
-            fileName = fileName.Replace("\"", "");
-            var parse = new WriteRawDataToFile();
-            if (fileName.ToLower().EndsWith(".doc") || fileName.ToLower().EndsWith(".docx"))
-            {
-                parse = new WordParse(data, accessToken, fileId);
-            }
-            else if (fileName.ToLower().EndsWith(".xls") || fileName.ToLower().EndsWith(".xlsx"))
-            {
-                parse = new ExcelParse(data, accessToken, fileId);
-            }
-            else if (fileName.ToLower().EndsWith(".ppt") || fileName.ToLower().EndsWith(".pptx"))
-            {
-                parse = new PowerPointParse(data, accessToken, fileId);
-            }
-            else
-            {
-                return string.Empty;
-            }
-
-            return parse.TempDataToHtmlAndUploadToOneDrive();
         }
     }
 }

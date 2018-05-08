@@ -64,11 +64,15 @@ namespace ShareDataService
                             cellTexts = m.Descendants<Cell>().Select(cell =>
                             {
                                 var cellText = GetCellText(cell, workbookPart);
-
+                                if (string.IsNullOrEmpty(cellText))
+                                {
+                                    return "";
+                                }
                                 // For the brower can display xml snippet normally.
                                 cellText = cellText.Replace("<", @"&lt;");
                                 return "<td>" + cellText + "</td>";
                             }).ToArray();
+                           
                             return "<tr>" + string.Join(string.Empty, cellTexts) + "</tr>";
                         });
 

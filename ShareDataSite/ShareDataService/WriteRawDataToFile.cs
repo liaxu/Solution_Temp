@@ -72,6 +72,10 @@ namespace ShareDataService
             var result = string.Empty;
             foreach (var tempData in this.ParseTempDataArray)
             {
+                if (tempData==null||string.IsNullOrEmpty(tempData.Data))
+                {
+                    continue;
+                }
                 switch (tempData.StorageType)
                 {
                     case StorageType.TextType:
