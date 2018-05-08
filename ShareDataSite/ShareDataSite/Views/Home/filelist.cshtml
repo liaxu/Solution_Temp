@@ -222,7 +222,7 @@
         methods: {
             getOneDriveFileList: function () {
                 var self = this;
-                var prefixUrl = "https://graph.microsoft.com/v1.0/me/drive/root";
+                var prefixUrl = "https://graph.microsoft.com/v1.0/drives/b!zLlbCzerpk2DHYV1N8enee0vlLDbhWFCsm0saPYUzUfPBzobEIGMR6Eb6roPe47Y/root";
                 GetFiles(prefixUrl).then(function (data) {
                     self.fileList = data;
                 });
