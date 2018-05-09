@@ -76,7 +76,9 @@ $.graph.prototype.GetFileList = function (prefixUrl) {
                 "Content-Type": "application/json",
                 "Prefer": 'outlook.timezone="' + Date.timeZone + '"'
             },
-            request_body: {}
+            request_body: {
+                stamp: app.makeid()//a random string in order to prevent cache
+            }
         },
         "GET",
         true);

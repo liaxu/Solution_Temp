@@ -21,6 +21,16 @@ Office.initialize = function () {
             }
         });
 
+        app.makeid = function () {
+            var text = "";
+            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+            for (var i = 0; i < 5; i++)
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+            return text;
+        }
+
         app.insertImage = function (base64, callback) {
             Office.context.document.setSelectedDataAsync(base64, {
                 coercionType: Office.CoercionType.Image,
