@@ -10,8 +10,6 @@
 //when Office loaded complete
 Office.initialize = function () {
     var app = window.app;
-    var element = document.querySelector('.ms-MessageBanner');
-    var messageBanner = new fabric.MessageBanner(element);
 
     $(document).ready(function () {
         //call function in app.onready when login success
@@ -22,6 +20,16 @@ Office.initialize = function () {
                 })
             }
         });
+
+        app.makeid = function () {
+            var text = "";
+            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+            for (var i = 0; i < 5; i++)
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+            return text;
+        }
 
         app.insertImage = function (base64, callback) {
             Office.context.document.setSelectedDataAsync(base64, {
@@ -115,6 +123,8 @@ Office.initialize = function () {
             }, 3000);
         }
 
+        var element = document.querySelector('.ms-MessageBanner');
+        var messageBanner = new fabric.MessageBanner(element);
         messageBanner.hideBanner();
         app.showNotification = function (header, content) {
             $("#notification-header").text(header);
