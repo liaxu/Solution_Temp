@@ -12,14 +12,6 @@ Office.initialize = function () {
     var app = window.app;
 
     $(document).ready(function () {
-        //call function in app.onready when login success
-        $.graph.login(function (res) {
-            if (res) {
-                app.onready.map(function (func) {
-                    func();
-                })
-            }
-        });
 
         app.makeid = function () {
             var text = "";
@@ -134,6 +126,15 @@ Office.initialize = function () {
 
             setTimeout(messageBanner.hideBanner, 3000);
         }
+
+        //call function in app.onready when login success
+        $.graph.login(function (res) {
+            if (res) {
+                app.onready.map(function (func) {
+                    func();
+                })
+            }
+        });
 
     })
 
