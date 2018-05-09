@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 using Newtonsoft.Json;
 using ShareDataService;
@@ -77,5 +78,42 @@ namespace ShareDataSite.Controllers
             }
 
         }
+
+        /// <summary>
+        /// Initialize the file list to Onedrive.
+        /// </summary>
+        /// <returns></returns>
+        [Route("api/initFilesToOneDrive")]
+        [HttpPost]
+        public async Task InitFileListToOneDriveAsync(string accessToken)
+        {
+            try
+            {
+                var srcDir = Server.MapPath("~/App_Data");
+                DirectoryInfo folder = new DirectoryInfo(srcDir);
+                foreach (FileInfo file in folder.GetFiles())
+                {
+                    // Get stream objects from fileInfo object.
+                    var fileStream = file.Open(FileMode.Open);
+
+                    // Judgment file stream content length greater than 4MB use UploadBigFileToOneDrive method, otherwise use UploadSmallFileToOneDrive method.
+                    if (new byte[fileStream.Length].Length < (4 * 1024 * 1024))
+                    {
+                        await UploadFileToOneDrive.UploadSmallFileToOneDrive(accessToken, fileStream, file.Name, "https://graph.microsoft.com/v1.0");
+                    }
+                    else
+                    {
+                        await UploadFileToOneDrive.UploadBigFileToOneDrive(accessToken, fileStream, file.Name, "https://graph.microsoft.com/v1.0");
+                    }
+                    fileStream.Close();
+                }
+            }
+            catch (Exception x)
+            {
+                Response.StatusCode = 400;
+            }
+        }
+
+
     }
 }

@@ -302,6 +302,7 @@
     <Content Include="Scripts\Office\1\nl-nl\outlook_strings.js" />
     <Content Include="Scripts\Office\1\o15apptofilemappingtable.debug.js" />
     <Content Include="Scripts\Office\1\o15apptofilemappingtable.js" />
+    <Content Include="App_Data\Demo_Test.docx" />
     <None Include="Scripts\Office\1\office-vsdoc.js" />
     <Content Include="Scripts\Office\1\office.debug.js" />
     <Content Include="Scripts\Office\1\office.js" />
@@ -456,7 +457,6 @@
     <Content Include="Views\Shared\_AuthorizedSetting.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
     <Folder Include="Content\css\" />
     <Folder Include="Views\TransformData\" />
   </ItemGroup>

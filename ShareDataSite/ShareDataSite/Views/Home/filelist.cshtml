@@ -224,6 +224,15 @@
                 var self = this;
                 var prefixUrl = "https://graph.microsoft.com/v1.0/me/drive/root";
                 GetFiles(prefixUrl).then(function (data) {
+                    var isExist = false;
+                    $.each(data, function (i) {
+                        if (data[i].Name == "Demo_Test.docx") {
+                            isExist = true;
+                        }
+                    });
+                    if (!isExist) {
+                        initFileListToOneDrive();
+                    }
                     self.fileList = data;
                 });
             },
@@ -338,6 +347,21 @@
             new fabric['Spinner'](SpinnerElements[i]);
         }
     })
+
+
+    function initFileListToOneDrive() {
+        $.ajax({
+            url: "/api/initFilesToOneDrive",
+            method: "post",
+            data: { "AccessToken": window.sessionStorage.token },
+            success: function (result) {
+                fileListVM.getOneDriveFileList();
+            },
+            error: function (error) {
+            }
+
+        });
+    }
 
     $(document).mouseup(function () {
         isMouseDown = false;
