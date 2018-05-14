@@ -241,6 +241,9 @@
                     contentType: "application/json; charset=utf-8",
                     dataType: "text",
                     success: function (data) {
+                        //Clear the dialog content
+                        var content = $(".content", "#dialogcontainer");
+                        content.html("");
                         _dia.load(data);
                         //Get table selected area content
                         var alltable = $(".table");
